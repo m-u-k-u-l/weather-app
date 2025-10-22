@@ -1,12 +1,5 @@
-.card {
-  width: 100%;
-  max-width: 100%;
-}
+/* App.css */
 
-.input-group {
-  width: 100%;
-}
-
-button:focus, input:focus {
-  box-shadow: none !important;
+.container.app-container {
+  max-width: 600px;
 }

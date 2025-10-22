@@ -1,0 +1,33 @@
+/* WeatherCard.css */
+
+.weather-card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.weather-icon {
+  font-size: 2.8rem;
+  line-height: 1;
+}
+
+
+/* SearchBar.css */
+
+.search-bar {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* shadow-sm */
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.search-input {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-top-left-radius: 12px !important;
+  border-bottom-left-radius: 12px !important;
+}
+
+.search-button {
+  border-top-right-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+  padding: 0 1rem;
+}

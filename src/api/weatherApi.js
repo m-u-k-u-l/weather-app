@@ -1,9 +1,6 @@
 // src/api/weatherApi.js
-
 // --- Fetch current weather directly from Open-Meteo ---
 export async function fetchWeather(city) {
-
-  // console.log('city----', city);
 
   try {
     // Step 1: Geocode city name → get latitude/longitude
@@ -13,6 +10,7 @@ export async function fetchWeather(city) {
       )}&count=1&language=en&format=json`
     );
     const geoJson = await geoRes.json();
+
     if (!geoJson.results?.length) throw new Error('City not found');
 
     const { latitude, longitude, name, country, timezone } = geoJson.results[0];
@@ -29,6 +27,7 @@ export async function fetchWeather(city) {
     const weatherRes = await fetch(
       `https://api.open-meteo.com/v1/forecast?${params}`
     );
+
     const weatherJson = await weatherRes.json();
 
     if (!weatherJson.current_weather)
@@ -39,7 +38,6 @@ export async function fetchWeather(city) {
     const humidityIndex = weatherJson.hourly.time.indexOf(currentTime);
     const humidity = weatherJson.hourly.relativehumidity_2m[humidityIndex];
 
-    // Format same as backend response
     return {
       location: { name, country, latitude, longitude, timezone },
       current: {

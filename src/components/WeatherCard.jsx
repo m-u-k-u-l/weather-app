@@ -1,4 +1,3 @@
-import React from 'react';
 import { Card, Row, Col, Button } from 'react-bootstrap';
 import { weatherCodeMap, formatTemperature } from '../utils/weatherUtils';
 
@@ -7,23 +6,26 @@ export default function WeatherCard({ data, unit, onToggleUnit }) {
   const meta = weatherCodeMap[code] || { text: 'Unknown', icon: '❓' };
 
   return (
-    <Card
-      className="shadow-sm border-0 w-100"
-      style={{
-        borderRadius: '12px',
-        overflow: 'hidden',
-      }}
-    >
+    <Card className="shadow-sm border-0 w-100 weather-card">
       <Card.Body>
         <Row className="align-items-center">
           <Col>
             <h5 className="fw-semibold mb-1">
               {data.location.name}, {data.location.country}
             </h5>
-            <small className="text-muted">{data.current.time}</small>
+            <small className="text-muted">
+              {new Date(data.current.time).toLocaleString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true
+              })}
+            </small>
           </Col>
           <Col className="text-end">
-            <div style={{ fontSize: '2.8rem', lineHeight: 1 }}>{meta.icon}</div>
+            <div className="weather-icon">{meta.icon}</div>
             <h3 className="fw-bold mb-1">{formatTemperature(data.current.temperature_c, unit)}</h3>
             <p className="text-muted mb-0">{meta.text}</p>
           </Col>

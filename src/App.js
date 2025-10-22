@@ -1,50 +1,70 @@
 // src/App.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Alert, Spinner, Button } from 'react-bootstrap';
-
-// Custom components
 import SearchBar from './components/SearchBar';
 import WeatherCard from './components/WeatherCard';
-
-// API
 import { fetchWeather } from './api/weatherApi';
+import './App.css';
 
 export default function App() {
-
-  const [city, setCity] = useState(localStorage.getItem('lastCity') || '');
+  const [city, setCity] = useState(''); // current search
+  const [lastCity, setLastCity] = useState(localStorage.getItem('lastCity') || ''); // previous search
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [unit, setUnit] = useState(localStorage.getItem('tempUnit') || 'C');
 
+  // Handle search
+  const handleSearch = useCallback(
+    async (q) => {
+      if (!q) return;
+
+      setLoading(true);
+      setError(null);
+      setData(null);
+
+      try {
+        const res = await fetchWeather(q);
+        setData(res);
+
+        // Persist current city and weather data
+        localStorage.setItem('currentCity', q);
+        localStorage.setItem('lastWeatherData', JSON.stringify(res));
+
+        // Update lastCity only if previous city exists and is different
+        if (city && city !== q) {
+          setLastCity(city);
+          localStorage.setItem('lastCity', city);
+        }
+
+        setCity(q);
+      } catch (err) {
+        setError(err?.error || 'City Not Found');
+        setData(null);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [city]
+  );
+
+  // Persist current city and weather on mount
   useEffect(() => {
-    if (city) handleSearch(city);
+    const savedCity = localStorage.getItem('currentCity');
+    const savedData = localStorage.getItem('lastWeatherData');
+    if (savedCity && savedData) {
+      setCity(savedCity);
+      setData(JSON.parse(savedData));
+    }
   }, []);
 
+  // Persist temperature unit changes
   useEffect(() => {
     localStorage.setItem('tempUnit', unit);
   }, [unit]);
 
-  const handleSearch = async (q) => {
-    setLoading(true);
-    setError(null);
-    setData(null);
-    try {
-      const res = await fetchWeather(q);
-      setData(res);
-      setCity(q);
-      localStorage.setItem('lastCity', q);
-    } catch (err) {
-      setError(err?.error || 'City Not Found');
-      setData(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <Container className="mt-5" style={{ maxWidth: '600px' }}>
-
+    <Container className="mt-5 app-container">
       {/* Header */}
       <div className="text-center mb-4">
         <h2 className="fw-bold text-primary">Weather Application</h2>
@@ -53,32 +73,34 @@ export default function App() {
 
       {/* Search Bar */}
       <div className="w-100 mb-3">
-        <SearchBar
-          key={city === '' ? 'empty' : city} // Re-render when city is cleared
-          onSearch={handleSearch}
-          defaultValue={localStorage.getItem('lastCity') || ''}
-        />
+        <SearchBar onSearch={handleSearch} defaultValue={city} />
       </div>
 
-
-      {/* Last searched city + Clear Button */}
-      {city && (
+      {/* Clear Current Search + Last City */}
+      {(city || lastCity) && (
         <div className="d-flex justify-content-between align-items-center mb-3 w-100">
+
           <small className="text-muted">
-            Last searched city: <strong className="text-dark">{city}</strong>
+            {lastCity && (
+              <> Last searched city: <strong className="text-dark">{lastCity}</strong></>
+            )}
           </small>
-          <Button
-            variant="outline-danger"
-            size="sm"
-            onClick={() => {
-              setCity('');
-              setData(null);
-              setError(null);
-              localStorage.removeItem('lastCity');
-            }}
-          >
-            Clear Search
-          </Button>
+
+          {city && (
+            <Button
+              variant="outline-danger"
+              size="sm"
+              onClick={() => {
+                setCity('');         // clear current search input
+                setData(null);       // clear current weather data
+                setError(null);      // clear any error
+                localStorage.removeItem('currentCity');
+                localStorage.removeItem('lastWeatherData');
+              }}
+            >
+              Clear Search Results
+            </Button>
+          )}
         </div>
       )}
 
