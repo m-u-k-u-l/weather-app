@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 # Weather Application 🌤️
-=======
-# React Weather App 🌤️
->>>>>>> 5140f38fd89ae53fd4ae8578f5ee4e6029f932ba
 
 A simple, responsive weather application built with **React** and **Bootstrap** that fetches real-time weather data directly from the **Open-Meteo API**.
 
